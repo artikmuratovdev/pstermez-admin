@@ -1,10 +1,10 @@
 import { createBrowserRouter, redirect } from 'react-router'
 
-import App from './App'
-import Dashboard from './pages/Dashboard/Dashboard'
-import DashboardIndex from './pages/Dashboard/DashboardIndex'
-import Login from './pages/Login/Login'
-import PrivateRoute from './routes/PrivateRoute'
+import App from '../App'
+import Dashboard from '../pages/Dashboard/Dashboard'
+import DashboardIndex from '../pages/Dashboard/DashboardIndex'
+import Login from '../pages/Login/Login'
+import PrivateRoute from './PrivateRoute'
 
 export default createBrowserRouter([
   {

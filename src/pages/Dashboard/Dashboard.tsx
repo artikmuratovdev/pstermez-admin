@@ -13,18 +13,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { clearAuthToken } from "@/lib/auth"
-import { LogOut } from "lucide-react"
-import { Outlet, useNavigate } from "react-router"
+import { Outlet } from "react-router"
 
 export default function Page() {
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    clearAuthToken()
-    navigate("/login", { replace: true })
-  }
 
   return (
     <SidebarProvider>
@@ -47,10 +38,6 @@ export default function Page() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <Button className="ml-auto" onClick={handleLogout} variant="outline">
-            <LogOut data-icon="inline-start" />
-            Chiqish
-          </Button>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-5 px-7">
           <Outlet />

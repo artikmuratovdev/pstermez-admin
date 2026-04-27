@@ -1,9 +1,10 @@
-import * as React from "react"
+import * as React from "react";
 
-import { SearchForm } from "@/components/search-form"
+import { SearchForm } from "@/components/search-form";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,8 +13,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { GalleryVerticalEnd } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { GalleryVerticalEnd } from "lucide-react";
+import { NavUser } from "./Side-User";
 
 // This is sample data.
 const data = {
@@ -25,18 +27,20 @@ const data = {
         {
           title: "Installation",
           url: "#",
-          isActive:true
+          isActive: true,
         },
         {
           title: "Project Structure",
           url: "#",
         },
       ],
-    }
+    },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -76,7 +80,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
