@@ -1,12 +1,9 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
+  Settings,
 } from "lucide-react"
 
 import {
@@ -30,7 +27,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useNavigate } from "react-router"
-import { clearAuthToken } from "@/lib/auth"
+import { baseApi } from "@/app/api/baseApi"
+import { getUserFromMeResponse, useMeQuery } from "@/app/api/auth"
+import { clearAuthTokens } from "@/lib/auth"
+import { useDispatch } from "react-redux"
 
 export function NavUser({
   user = {
@@ -46,12 +46,25 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { data } = useMeQuery()
+  const authUser = data ? getUserFromMeResponse(data) : null
+  const activeUser = {
+    name: authUser?.name ?? authUser?.fullName ?? user.name,
+    email: authUser?.email ?? user.email,
+    avatar: authUser?.avatar ?? user.avatar,
+  }
 
   const handleLogout = () => {
-    clearAuthToken();
-    navigate("/login", { replace: true });
-  };
+    clearAuthTokens()
+    dispatch(baseApi.util.resetApiState())
+    navigate("/login", { replace: true })
+  }
+
+  const handleSettings = () => {
+    navigate("/settings")
+  }
 
   return (
     <SidebarMenu>
@@ -62,15 +75,17 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+              <Avatar className="size-8 rounded-lg">
+                <AvatarImage src={activeUser.avatar} alt={activeUser.name} />
+                <AvatarFallback className="rounded-lg">
+                  {activeUser.name.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">{activeUser.name}</span>
+                <span className="truncate text-xs">{activeUser.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -81,36 +96,23 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <Avatar className="size-8 rounded-lg">
+                  <AvatarImage src={activeUser.avatar} alt={activeUser.name} />
+                  <AvatarFallback className="rounded-lg">
+                    {activeUser.name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-medium">{activeUser.name}</span>
+                  <span className="truncate text-xs">{activeUser.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+              <DropdownMenuItem onClick={handleSettings}>
+                <Settings />
+                Settings
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

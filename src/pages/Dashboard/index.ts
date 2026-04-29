@@ -1,2 +1,2 @@
-export { default as Dashboard } from './Dashboard'
-export { default as DashboardIndex } from './DashboardIndex'
+export { default as Dashboard } from './Layout'
+export { default as DashboardIndex } from './Home'
