@@ -223,11 +223,11 @@ const NewsPage = () => {
             <EmptyList description="Filter bo'yicha news topilmadi." title="News yo'q" />
           ) : null}
           {newsList.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
               {newsList.map((news) => (
-                <Card key={news._id}>
+                <Card className="flex h-full overflow-hidden" key={news._id}>
                   <NewsMediaPreview news={news} />
-                  <CardHeader>
+                  <CardHeader className="shrink-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline">{getMediaSummary(news.media)}</Badge>
                       <Badge variant="outline">
@@ -235,25 +235,27 @@ const NewsPage = () => {
                         {news.views ?? 0}
                       </Badge>
                     </div>
-                    <CardTitle>
+                    <CardTitle className="line-clamp-2 min-h-13 text-xl leading-7">
                       <Link className="underline-offset-4 hover:underline" to={news._id}>
                         {news.title}
                       </Link>
                     </CardTitle>
-                    <CardDescription>{getCategoryName(news.category)}</CardDescription>
+                    <CardDescription className="truncate">
+                      {getCategoryName(news.category)}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="flex flex-col gap-3">
-                    <p className="line-clamp-3 text-muted-foreground">
+                  <CardContent className="flex flex-1 flex-col gap-3">
+                    <p className="line-clamp-3 min-h-18 text-muted-foreground">
                       {news.description}
                     </p>
-                    <div className="flex items-center justify-between gap-3 text-sm">
+                    <div className="mt-auto flex items-center justify-between gap-3 text-sm">
                       <span className="text-muted-foreground">Created by</span>
                       <span className="truncate font-medium">
                         {getAuthorName(news.createdBy)}
                       </span>
                     </div>
                   </CardContent>
-                  <CardFooter className="justify-between gap-2">
+                  <CardFooter className="mt-auto justify-between gap-2 border-t bg-muted/40">
                     <Button asChild size="sm" variant="outline">
                       <Link to={news._id}>
                         <Eye data-icon="inline-start" />

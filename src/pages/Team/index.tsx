@@ -52,7 +52,7 @@ const InternationalBadge = ({ international }: { international: boolean }) => (
 )
 
 const TeamCardImage = ({ member }: { member: TeamMember }) => (
-  <div className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-muted">
+  <div className="flex aspect-4/3 w-full items-center justify-center overflow-hidden bg-muted">
     {member.avatar ? (
       <img
         alt={member.name}

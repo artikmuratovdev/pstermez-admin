@@ -31,7 +31,7 @@ const TeamDetailImage = ({
   avatar?: string
   name: string
 }) => (
-  <div className="flex aspect-[4/3] w-full max-w-sm items-center justify-center overflow-hidden rounded-xl bg-muted ring-1 ring-foreground/10">
+  <div className="flex aspect-4/3 w-full max-w-sm items-center justify-center overflow-hidden rounded-xl bg-muted ring-1 ring-foreground/10">
     {avatar ? (
       <img alt={name} className="size-full object-cover" src={avatar} />
     ) : (

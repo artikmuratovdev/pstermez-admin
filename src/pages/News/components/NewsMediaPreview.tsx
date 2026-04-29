@@ -25,7 +25,7 @@ const NewsMediaPreview = ({
       className={
         size === 'sm'
           ? 'relative flex h-14 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted'
-          : 'relative flex aspect-video w-full items-center justify-center overflow-hidden bg-muted'
+          : 'relative flex aspect-video w-full shrink-0 items-center justify-center overflow-hidden bg-muted'
       }
     >
       {previewUrl ? (
