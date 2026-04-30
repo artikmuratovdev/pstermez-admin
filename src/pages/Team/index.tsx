@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
-import { Eye, LayoutGrid, List, Plus } from 'lucide-react'
+import { Eye, LayoutGrid, List, Pencil, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { getApiErrorMessage } from '@/app/api/baseApi'
@@ -33,9 +33,13 @@ import {
   ErrorAlert,
   FilterSelect,
   PageHeader,
+  PaginationControls,
   TableSkeleton,
 } from '../components/dashboard-ui'
-import { roleOptions } from './constants'
+import { getRoleLabel, roleOptions } from './constants'
+
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 20
 
 const initials = (name: string) =>
   name
@@ -44,6 +48,14 @@ const initials = (name: string) =>
     .join('')
     .slice(0, 2)
     .toUpperCase()
+
+const truncateSubject = (subject?: string) => {
+  if (!subject) return '-'
+
+  const words = subject.trim().split(/\s+/)
+
+  return words.length > 4 ? `${words.slice(0, 4).join(' ')}...` : subject
+}
 
 const InternationalBadge = ({ international }: { international: boolean }) => (
   <Badge variant={international ? 'secondary' : 'outline'}>
@@ -71,13 +83,20 @@ const TeamCardImage = ({ member }: { member: TeamMember }) => (
 const TeamPage = () => {
   const [roleFilter, setRoleFilter] = useState('all')
   const [internationalFilter, setInternationalFilter] = useState('all')
+  const [page, setPage] = useState(DEFAULT_PAGE)
   const filters = {
+    page,
+    limit: DEFAULT_LIMIT,
     ...(roleFilter !== 'all' ? { role: roleFilter } : {}),
     ...(internationalFilter !== 'all' ? { international: internationalFilter } : {}),
   }
   const { data, error, isLoading } = useGetTeamQuery(filters)
   const [deleteMember, deleteState] = useDeleteTeamMemberMutation()
   const team = data?.data ?? []
+
+  useEffect(() => {
+    setPage(DEFAULT_PAGE)
+  }, [roleFilter, internationalFilter])
 
   const handleDelete = async (id: string) => {
     try {
@@ -182,9 +201,9 @@ const TeamPage = () => {
                         </TableCell>
                         <TableCell>{member.email}</TableCell>
                         <TableCell>
-                          <Badge variant="outline">{member.role}</Badge>
+                          <Badge variant="outline">{getRoleLabel(member.role)}</Badge>
                         </TableCell>
-                        <TableCell>{member.subject ?? '-'}</TableCell>
+                        <TableCell>{truncateSubject(member.subject)}</TableCell>
                         <TableCell>
                           <InternationalBadge international={member.international} />
                         </TableCell>
@@ -198,7 +217,10 @@ const TeamPage = () => {
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
-                              <Link to={`${member._id}/edit`}>Edit</Link>
+                              <Link to={`${member._id}/edit`}>
+                                <Pencil data-icon="inline-start" />
+                                Edit
+                              </Link>
                             </Button>
                             <DeleteAction
                               description={`${member.name} team member o'chiriladi.`}
@@ -240,9 +262,9 @@ const TeamPage = () => {
                   </CardHeader>
                   <CardContent className="flex flex-col gap-3">
                     <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline">{member.role}</Badge>
+                      <Badge variant="outline">{getRoleLabel(member.role)}</Badge>
                       {member.subject ? (
-                        <Badge variant="outline">{member.subject}</Badge>
+                        <Badge variant="outline">{truncateSubject(member.subject)}</Badge>
                       ) : null}
                     </div>
                     {member.country ? (
@@ -261,7 +283,10 @@ const TeamPage = () => {
                     </Button>
                     <div className="flex gap-2">
                       <Button asChild size="sm" variant="outline">
-                        <Link to={`${member._id}/edit`}>Edit</Link>
+                        <Link to={`${member._id}/edit`}>
+                          <Pencil data-icon="inline-start" />
+                          Edit
+                        </Link>
                       </Button>
                       <DeleteAction
                         description={`${member.name} team member o'chiriladi.`}
@@ -277,6 +302,15 @@ const TeamPage = () => {
           ) : null}
         </TabsContent>
       </Tabs>
+      {data ? (
+        <PaginationControls
+          next={data.next}
+          onPageChange={setPage}
+          page={data.page}
+          prev={data.prev}
+          totalPages={data.totalPages}
+        />
+      ) : null}
     </section>
   )
 }

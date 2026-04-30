@@ -1,10 +1,7 @@
-import { Link, useParams } from 'react-router'
-
-import { ArrowLeft } from 'lucide-react'
+import { useParams } from 'react-router'
 
 import { useGetTeamMemberQuery } from '@/app/api/team'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -14,7 +11,8 @@ import {
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ErrorAlert, PageHeader } from '../../components/dashboard-ui'
+import { BackButton, ErrorAlert, PageHeader } from '../../components/dashboard-ui'
+import { getRoleLabel } from '../constants'
 
 const initials = (name: string) =>
   name
@@ -53,13 +51,9 @@ const TeamDetailPage = () => {
     <section className="flex flex-col gap-4">
       <PageHeader
         action={
-          <Button asChild variant="outline">
-            <Link to="/team">
-              <ArrowLeft data-icon="inline-start" />
-              Team
-            </Link>
-          </Button>
+          <BackButton fallback="/team">Team</BackButton>
         }
+        actionPlacement="start"
         description="GET /team/:id orqali team detail ko'rish."
         title="Team detail"
       />
@@ -78,7 +72,7 @@ const TeamDetailPage = () => {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline">{member.role}</Badge>
+              <Badge variant="outline">{getRoleLabel(member.role)}</Badge>
               <Badge variant={member.international ? 'secondary' : 'outline'}>
                 {member.international ? 'International' : 'Local'}
               </Badge>

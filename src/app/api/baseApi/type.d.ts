@@ -13,6 +13,19 @@ export type ApiSuccessResponse<TData> = {
   data: TData
 }
 
+export type PaginatedApiSuccessResponse<TData> = ApiSuccessResponse<TData> & {
+  page: number
+  limit: number
+  next?: number
+  prev?: number
+  totalPages: number
+}
+
+export type PaginationParams = {
+  page?: number
+  limit?: number
+}
+
 export type ApiErrorResponse = {
   success: false
   error: {
@@ -80,7 +93,7 @@ export type Category = {
   updated_at?: string
 }
 
-export type CategoryFilters = {
+export type CategoryFilters = PaginationParams & {
   type?: string
   isActive?: boolean | string
 }
@@ -131,7 +144,7 @@ export type NewsItem = {
   updated_at?: string
 }
 
-export type NewsFilters = {
+export type NewsFilters = PaginationParams & {
   category?: string
   type?: string
 }
@@ -159,7 +172,7 @@ export type TeamMember = {
   updated_at?: string
 }
 
-export type TeamFilters = {
+export type TeamFilters = PaginationParams & {
   role?: string
   international?: boolean | string
 }

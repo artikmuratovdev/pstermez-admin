@@ -15,12 +15,13 @@ import type { LoginResponse } from './type'
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
+  credentials: "include",
   prepareHeaders: (headers) => {
-    headers.set('Accept', 'application/json')
+    headers.set("Accept", "application/json")
 
     const token = getAuthToken()
     if (token) {
-      headers.set('Authorization', `Bearer ${token}`)
+      headers.set("Authorization", `Bearer ${token}`)
     }
 
     return headers

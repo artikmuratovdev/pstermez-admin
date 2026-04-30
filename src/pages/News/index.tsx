@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
-import { Eye, LayoutGrid, List, Plus, } from 'lucide-react'
+import { Eye, LayoutGrid, List, Pencil, Plus, } from 'lucide-react'
 import { toast } from 'sonner'
 
 import type {
@@ -40,9 +40,12 @@ import {
   ErrorAlert,
   FilterSelect,
   PageHeader,
+  PaginationControls,
   TableSkeleton,
 } from '../components/dashboard-ui'
 
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 20
 
 
 const getCategoryName = (category: NewsItem['category']) =>
@@ -68,15 +71,26 @@ const getMediaSummary = (media: NewsItem['media']) => {
 const NewsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [mediaTypeFilter, setMediaTypeFilter] = useState('all')
-  const { data: categoriesData } = useGetCategoriesQuery({ type: 'news' })
+  const [page, setPage] = useState(DEFAULT_PAGE)
+  const { data: categoriesData } = useGetCategoriesQuery({
+    type: 'news',
+    page: DEFAULT_PAGE,
+    limit: 100,
+  })
   const categories = categoriesData?.data ?? []
   const filters = {
+    page,
+    limit: DEFAULT_LIMIT,
     ...(categoryFilter !== 'all' ? { category: categoryFilter } : {}),
     ...(mediaTypeFilter !== 'all' ? { type: mediaTypeFilter } : {}),
   }
   const { data, error, isLoading } = useGetNewsQuery(filters)
   const [deleteNews, deleteState] = useDeleteNewsMutation()
   const newsList = data?.data ?? []
+
+  useEffect(() => {
+    setPage(DEFAULT_PAGE)
+  }, [categoryFilter, mediaTypeFilter])
 
   const handleDelete = async (id: string) => {
     try {
@@ -198,7 +212,10 @@ const NewsPage = () => {
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
-                              <Link to={`${news._id}/edit`}>Edit</Link>
+                              <Link to={`${news._id}/edit`}>
+                                <Pencil data-icon="inline-start" />
+                                Edit
+                              </Link>
                             </Button>
                             <DeleteAction
                               description={`${news.title} news o'chiriladi.`}
@@ -264,7 +281,10 @@ const NewsPage = () => {
                     </Button>
                     <div className="flex gap-2">
                       <Button asChild size="sm" variant="outline">
-                        <Link to={`${news._id}/edit`}>Edit</Link>
+                        <Link to={`${news._id}/edit`}>
+                          <Pencil data-icon="inline-start" />
+                          Edit
+                        </Link>
                       </Button>
                       <DeleteAction
                         description={`${news.title} news o'chiriladi.`}
@@ -280,6 +300,15 @@ const NewsPage = () => {
           ) : null}
         </TabsContent>
       </Tabs>
+      {data ? (
+        <PaginationControls
+          next={data.next}
+          onPageChange={setPage}
+          page={data.page}
+          prev={data.prev}
+          totalPages={data.totalPages}
+        />
+      ) : null}
     </section>
   )
 }

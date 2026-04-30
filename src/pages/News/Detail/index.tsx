@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
-import { ArrowLeft, Eye, ImageIcon } from 'lucide-react'
+import { Eye, ImageIcon } from 'lucide-react'
 
 import type { NewsMedia } from '@/app/api/baseApi/type'
-import { useGetNewsByIdQuery } from '@/app/api/news'
+import { useGetNewsQuery } from '@/app/api/news'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import {
   Carousel,
   type CarouselApi,
@@ -17,7 +16,12 @@ import {
 } from '@/components/ui/carousel'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ErrorAlert, formatDate } from '../../components/dashboard-ui'
+import {
+  BackButton,
+  ErrorAlert,
+  PageHeader,
+  formatDate,
+} from '../../components/dashboard-ui'
 
 const getCategoryName = (category: string | { name: string }) =>
   typeof category === 'string' ? category : category.name
@@ -159,22 +163,18 @@ const NewsMediaCarousel = ({
 
 const NewsDetailPage = () => {
   const { newsId = '' } = useParams()
-  const { data, error, isLoading } = useGetNewsByIdQuery(newsId, {
-    skip: !newsId,
-  })
-  const news = data?.data
+  const { data, error, isLoading } = useGetNewsQuery({ page: 1, limit: 1000 })
+  const news = data?.data.find((item) => item._id === newsId)
   const primaryMedia = getPrimaryMedia(news?.media)
 
   return (
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <div>
-        <Button asChild variant="outline">
-          <Link to="/news">
-            <ArrowLeft data-icon="inline-start" />
-            News
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        action={<BackButton fallback="/news">News</BackButton>}
+        actionPlacement="start"
+        description="News detail va media ko'rish."
+        title="News detail"
+      />
       {error ? <ErrorAlert error={error} fallback="News detail olinmadi" /> : null}
       {isLoading ? (
         <div className="flex flex-col gap-4">

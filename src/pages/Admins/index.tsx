@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from 'react'
 
-import { Plus, Save } from 'lucide-react'
+import { Pencil, Plus, Save } from 'lucide-react'
 import { Navigate } from 'react-router'
 import { toast } from 'sonner'
 
@@ -264,6 +264,7 @@ const AdminsPage = () => {
                           admin={admin}
                           trigger={
                             <Button size="sm" variant="outline">
+                              <Pencil data-icon="inline-start" />
                               Edit
                             </Button>
                           }

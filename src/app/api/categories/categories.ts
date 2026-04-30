@@ -5,12 +5,13 @@ import type {
   CategoryFilters,
   CategoryFormRequest,
   MessageResponse,
+  PaginatedApiSuccessResponse,
 } from '@/app/api/baseApi/type'
 
 export const categoriesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query<
-      ApiSuccessResponse<Category[]>,
+      PaginatedApiSuccessResponse<Category[]>,
       CategoryFilters | void
     >({
       query: (params) => ({

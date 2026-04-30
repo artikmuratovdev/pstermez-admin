@@ -32,4 +32,20 @@ export const getApiErrorResponse = (
 export const getApiErrorMessage = (
   error: unknown,
   fallback = 'Server bilan ulanishda xatolik yuz berdi.'
-) => getApiErrorResponse(error)?.error.msg ?? fallback
+) => {
+  const apiErrorMessage = getApiErrorResponse(error)?.error.msg
+  if (apiErrorMessage) return apiErrorMessage
+
+  const queryError = error as FetchBaseQueryError
+  const data = queryError.data
+
+  if (typeof data === 'string') return data
+  if (!data || typeof data !== 'object') return fallback
+
+  const response = data as { message?: unknown; msg?: unknown }
+
+  if (typeof response.message === 'string') return response.message
+  if (typeof response.msg === 'string') return response.msg
+
+  return fallback
+}

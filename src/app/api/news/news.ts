@@ -5,11 +5,12 @@ import type {
   NewsFilters,
   NewsFormRequest,
   NewsItem,
+  PaginatedApiSuccessResponse,
 } from '@/app/api/baseApi/type'
 
 export const newsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getNews: builder.query<ApiSuccessResponse<NewsItem[]>, NewsFilters | void>(
+    getNews: builder.query<PaginatedApiSuccessResponse<NewsItem[]>, NewsFilters | void>(
       {
         query: (params) => ({
           url: '/news',

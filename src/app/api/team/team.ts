@@ -2,6 +2,7 @@ import baseApi from '@/app/api/baseApi/baseApi'
 import type {
   ApiSuccessResponse,
   MessageResponse,
+  PaginatedApiSuccessResponse,
   TeamFilters,
   TeamFormRequest,
   TeamMember,
@@ -9,7 +10,7 @@ import type {
 
 export const teamApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getTeam: builder.query<ApiSuccessResponse<TeamMember[]>, TeamFilters | void>(
+    getTeam: builder.query<PaginatedApiSuccessResponse<TeamMember[]>, TeamFilters | void>(
       {
         query: (params) => ({
           url: '/team',

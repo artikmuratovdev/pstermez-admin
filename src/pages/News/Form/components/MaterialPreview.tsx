@@ -88,13 +88,6 @@ const ThumbnailUploadZone = ({
       )}
 
       <Input
-        className="h-8 text-xs"
-        onChange={(event) => onThumbnailChange(event.target.value)}
-        placeholder="Yoki URL kiriting..."
-        value={thumbnail ?? ''}
-      />
-
-      <Input
         accept="image/*"
         className="hidden"
         disabled={disabled}

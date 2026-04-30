@@ -1,8 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router'
 
-import { AlertCircle, Inbox, Trash2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Inbox, Trash2 } from 'lucide-react'
 
 import { getApiErrorMessage } from '@/app/api/baseApi'
 import {
@@ -54,10 +55,12 @@ export const PageHeader = ({
   title,
   description,
   action,
+  actionPlacement = 'end',
 }: {
   title: string
   description: string
   action?: ReactNode
+  actionPlacement?: 'start' | 'end'
 }) => {
   const [container, setContainer] = useState<HTMLElement | null>(null)
 
@@ -69,15 +72,46 @@ export const PageHeader = ({
 
   return createPortal(
     <>
+      {action && actionPlacement === 'start' ? (
+        <div className="shrink-0">{action}</div>
+      ) : null}
       <div className="flex min-w-0 flex-col gap-0.5">
         <h2 className="truncate text-lg font-semibold tracking-normal md:text-xl">
           {title}
         </h2>
         <p className="line-clamp-1 text-sm text-muted-foreground">{description}</p>
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action && actionPlacement === 'end' ? (
+        <div className="shrink-0">{action}</div>
+      ) : null}
     </>,
     container
+  )
+}
+
+export const BackButton = ({
+  children,
+  fallback,
+}: {
+  children: ReactNode
+  fallback: string
+}) => {
+  const navigate = useNavigate()
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate(fallback)
+  }
+
+  return (
+    <Button onClick={handleBack} type="button" variant="outline">
+      <ArrowLeft data-icon="inline-start" />
+      {children}
+    </Button>
   )
 }
 
@@ -100,6 +134,44 @@ export const TableSkeleton = ({ rows = 5 }: { rows?: number }) => (
     {Array.from({ length: rows }).map((_, index) => (
       <Skeleton className="h-10" key={index} />
     ))}
+  </div>
+)
+
+export const PaginationControls = ({
+  page,
+  totalPages,
+  next,
+  prev,
+  onPageChange,
+}: {
+  page?: number
+  totalPages?: number
+  next?: number
+  prev?: number
+  onPageChange: (page: number) => void
+}) => (
+  <div className="flex flex-col items-center justify-between gap-3 border-t pt-4 md:flex-row">
+    <p className="text-sm text-muted-foreground">
+      Page {page ?? 1} / {totalPages ?? 1}
+    </p>
+    <div className="flex items-center gap-2">
+      <Button
+        disabled={!prev}
+        onClick={() => prev && onPageChange(prev)}
+        type="button"
+        variant="outline"
+      >
+        Prev
+      </Button>
+      <Button
+        disabled={!next}
+        onClick={() => next && onPageChange(next)}
+        type="button"
+        variant="outline"
+      >
+        Next
+      </Button>
+    </div>
   </div>
 )
 

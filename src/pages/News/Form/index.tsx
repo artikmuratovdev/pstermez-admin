@@ -1,7 +1,7 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
-import { ArrowLeft, FileText, ImageIcon, Info, Save, Tag, Upload, X } from 'lucide-react'
+import { FileText, ImageIcon, Info, Save, Tag, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { getApiErrorMessage } from '@/app/api/baseApi'
@@ -14,7 +14,7 @@ import type {
 import { useGetCategoriesQuery } from '@/app/api/categories'
 import {
   useCreateNewsMutation,
-  useGetNewsByIdQuery,
+  useGetNewsQuery,
   useUpdateNewsMutation,
 } from '@/app/api/news'
 import { useUploadFileMutation, useUploadFilesMutation } from '@/app/api/upload'
@@ -49,7 +49,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
-import { ErrorAlert, PageHeader } from '../../components/dashboard-ui'
+import { BackButton, ErrorAlert, PageHeader } from '../../components/dashboard-ui'
 import MaterialPreview from './components/MaterialPreview'
 
 const initialForm: NewsFormRequest = {
@@ -109,13 +109,17 @@ const NewsFormPage = () => {
   const navigate = useNavigate()
   const { newsId = '' } = useParams()
   const isEdit = Boolean(newsId)
-  const { data: categoriesData } = useGetCategoriesQuery({ type: 'news' })
+  const { data: categoriesData } = useGetCategoriesQuery({
+    type: 'news',
+    page: 1,
+    limit: 100,
+  })
   const {
     data,
     error: loadError,
     isLoading: isNewsLoading,
-  } = useGetNewsByIdQuery(newsId, { skip: !isEdit })
-  const news = data?.data
+  } = useGetNewsQuery({ page: 1, limit: 1000 }, { skip: !isEdit })
+  const news = data?.data.find((item) => item._id === newsId)
   const [form, setForm] = useState<NewsFormRequest>(() => getInitialForm(news))
   const [uploadQueue, setUploadQueue] = useState<File[]>([])
   const [loadedNewsId, setLoadedNewsId] = useState('')
@@ -258,13 +262,9 @@ const NewsFormPage = () => {
     <section className="flex flex-col gap-4">
       <PageHeader
         action={
-          <Button asChild variant="outline">
-            <Link to="/news">
-              <ArrowLeft data-icon="inline-start" />
-              Yangiliklar
-            </Link>
-          </Button>
+          <BackButton fallback="/news">Yangiliklar</BackButton>
         }
+        actionPlacement="start"
         description={
           isEdit
             ? 'Yangilik ma`lumotlarini tahrirlang va saqlang.'
@@ -481,10 +481,8 @@ const NewsFormPage = () => {
             </p>
           ) : null}
 
-          <div className="sticky bottom-4 z-10 flex items-center justify-end gap-3 rounded-xl border bg-background/95 px-4 py-3 shadow-lg backdrop-blur">
-            <Button asChild type="button" variant="outline">
-              <Link to="/news">Bekor qilish</Link>
-            </Button>
+          <div className="fixed bottom-10 right-10 z-10 flex items-center justify-end gap-3 rounded-xl border bg-background/95 px-4 py-3 shadow-lg backdrop-blur w-fit">
+            <BackButton fallback="/news">Bekor qilish</BackButton>
             <Button disabled={isLoading || isUploading} type="submit">
               <Save data-icon="inline-start" />
               {isLoading

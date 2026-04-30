@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { getUserFromMeResponse, useMeQuery } from "@/app/api/auth";
-import { SearchForm } from "@/components/search-form";
 import {
   Sidebar,
   SidebarContent,
@@ -16,7 +15,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  GalleryVerticalEnd,
   Home,
   Newspaper,
   Shield,
@@ -74,8 +72,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <NavLink to="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <GalleryVerticalEnd className="size-4" />
+                <div className="flex aspect-square size-11 items-center justify-center rounded-lg">
+                  <img src="/logo.webp" alt="logo" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">PS Termiz Admin</span>
@@ -85,7 +83,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SearchForm />
       </SidebarHeader>
       <SidebarContent>
         {/* We create a SidebarGroup for each parent. */}

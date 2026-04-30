@@ -1,6 +1,6 @@
-import { type FormEvent, type ReactNode, useState } from 'react'
+import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
 
-import { Plus, Save } from 'lucide-react'
+import { Pencil, Plus, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -53,8 +53,12 @@ import {
   ErrorAlert,
   FilterSelect,
   PageHeader,
+  PaginationControls,
   TableSkeleton,
 } from '../components/dashboard-ui'
+
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 20
 
 const categoryTypeOptions = [
   { label: 'News', value: 'news' },
@@ -68,6 +72,16 @@ const initialForm: CategoryFormRequest = {
   type: 'news',
   isActive: true,
 }
+
+const toSlug = (text: string) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
 
 const CategoryFormDialog = ({
   category,
@@ -91,6 +105,14 @@ const CategoryFormDialog = ({
   const [updateCategory, updateState] = useUpdateCategoryMutation()
   const error = createState.error ?? updateState.error
   const isLoading = createState.isLoading || updateState.isLoading
+
+  const handleNameChange = (value: string) => {
+    setForm((current) => ({
+      ...current,
+      name: value,
+      slug: toSlug(value),
+    }))
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -128,12 +150,7 @@ const CategoryFormDialog = ({
               <FieldLabel htmlFor="category-name">Name</FieldLabel>
               <Input
                 id="category-name"
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    name: event.target.value,
-                  }))
-                }
+                onChange={(event) => handleNameChange(event.target.value)}
                 required
                 value={form.name}
               />
@@ -151,6 +168,7 @@ const CategoryFormDialog = ({
                 required
                 value={form.slug}
               />
+              <FieldDescription>Name bo'yicha avtomatik yangilanadi.</FieldDescription>
             </Field>
             <Field data-invalid={Boolean(error)}>
               <FieldLabel>Type</FieldLabel>
@@ -204,13 +222,20 @@ const CategoryFormDialog = ({
 const CategoriesPage = () => {
   const [typeFilter, setTypeFilter] = useState('all')
   const [activeFilter, setActiveFilter] = useState('all')
+  const [page, setPage] = useState(DEFAULT_PAGE)
   const filters = {
+    page,
+    limit: DEFAULT_LIMIT,
     ...(typeFilter !== 'all' ? { type: typeFilter } : {}),
     ...(activeFilter !== 'all' ? { isActive: activeFilter } : {}),
   }
   const { data, error, isLoading } = useGetCategoriesQuery(filters)
   const [deleteCategory, deleteState] = useDeleteCategoryMutation()
   const categories = data?.data ?? []
+
+  useEffect(() => {
+    setPage(DEFAULT_PAGE)
+  }, [typeFilter, activeFilter])
 
   const handleDelete = async (id: string) => {
     try {
@@ -303,6 +328,7 @@ const CategoriesPage = () => {
                           category={category}
                           trigger={
                             <Button size="sm" variant="outline">
+                              <Pencil data-icon="inline-start" />
                               Edit
                             </Button>
                           }
@@ -319,6 +345,15 @@ const CategoriesPage = () => {
                 ))}
               </TableBody>
             </Table>
+          ) : null}
+          {data ? (
+            <PaginationControls
+              next={data.next}
+              onPageChange={setPage}
+              page={data.page}
+              prev={data.prev}
+              totalPages={data.totalPages}
+            />
           ) : null}
         </CardContent>
       </Card>

@@ -1,13 +1,14 @@
 import { type FormEvent, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
-import { ArrowLeft, Save, Upload } from 'lucide-react'
+import { Save, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { getApiErrorMessage } from '@/app/api/baseApi'
 import type { TeamFormRequest, TeamMember } from '@/app/api/baseApi/type'
 import {
   useCreateTeamMemberMutation,
+  useGetTeamQuery,
   useGetTeamMemberQuery,
   useUpdateTeamMemberMutation,
 } from '@/app/api/team'
@@ -32,7 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ErrorAlert, PageHeader } from '../../components/dashboard-ui'
+import { BackButton, ErrorAlert, PageHeader } from '../../components/dashboard-ui'
 import { isInternationalRole, roleOptions } from '../constants'
 
 const initialForm: TeamFormRequest = {
@@ -69,6 +70,7 @@ const TeamFormPage = () => {
   const navigate = useNavigate()
   const { teamId = '' } = useParams()
   const isEdit = Boolean(teamId)
+  const { data: teamData } = useGetTeamQuery({ page: 1, limit: 100 })
   const {
     data,
     error: loadError,
@@ -82,6 +84,8 @@ const TeamFormPage = () => {
   const [uploadFile, uploadState] = useUploadFileMutation()
   const error = createState.error ?? updateState.error
   const isLoading = createState.isLoading || updateState.isLoading
+  const existingCeo = teamData?.data.find((teamMember) => teamMember.role === 'ceo')
+  const isCeoOptionDisabled = Boolean(existingCeo && existingCeo._id !== teamId)
 
   useEffect(() => {
     if (member && loadedMemberId !== member._id) {
@@ -124,13 +128,9 @@ const TeamFormPage = () => {
     <section className="flex flex-col gap-4">
       <PageHeader
         action={
-          <Button asChild variant="outline">
-            <Link to="/team">
-              <ArrowLeft data-icon="inline-start" />
-              Team
-            </Link>
-          </Button>
+          <BackButton fallback="/team">Team</BackButton>
         }
+        actionPlacement="start"
         description="Team member ma'lumotlari, role enum va avatar."
         title={isEdit ? 'Team tahrirlash' : 'Team yaratish'}
       />
@@ -177,9 +177,7 @@ const TeamFormPage = () => {
                   <InputGroup>
                     <InputGroupInput
                       id="team-avatar"
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, avatar: event.target.value }))
-                      }
+                      readOnly
                       value={form.avatar ?? ''}
                     />
                     <InputGroupAddon>
@@ -212,13 +210,22 @@ const TeamFormPage = () => {
                       <SelectContent>
                         <SelectGroup>
                           {roleOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
+                            <SelectItem
+                              disabled={option.value === 'ceo' && isCeoOptionDisabled}
+                              key={option.value}
+                              value={option.value}
+                            >
                               {option.label}
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
+                    {isCeoOptionDisabled ? (
+                      <FieldDescription>
+                        CEO role allaqachon boshqa team memberga biriktirilgan.
+                      </FieldDescription>
+                    ) : null}
                   </Field>
                   <Field data-invalid={Boolean(error)}>
                     <FieldLabel htmlFor="team-subject">Subject</FieldLabel>
