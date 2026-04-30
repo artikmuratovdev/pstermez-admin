@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 
 import { AlertCircle, ArrowLeft, Inbox, Trash2 } from 'lucide-react'
 
-import { getApiErrorMessage } from '@/app/api/baseApi'
+import { apiFormatters, getApiErrorMessage } from '@/app/api/baseApi'
 import {
   Alert,
   AlertDescription,
@@ -46,9 +46,7 @@ type Option = {
 }
 
 export const formatDate = (value?: string) => {
-  if (!value) return '-'
-
-  return new Date(value).toLocaleDateString('uz-UZ')
+  return apiFormatters.date(value)
 }
 
 export const PageHeader = ({

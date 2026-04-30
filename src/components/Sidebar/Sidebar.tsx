@@ -17,6 +17,7 @@ import {
 import {
   Home,
   Newspaper,
+  Link as LinkIcon,
   Shield,
   Tags,
   Users,
@@ -49,6 +50,11 @@ const data = {
           title: "News",
           url: "/news",
           icon: Newspaper,
+        },
+        {
+          title: "Recommendations",
+          url: "/recommendations",
+          icon: LinkIcon,
         },
         {
           title: "Team",

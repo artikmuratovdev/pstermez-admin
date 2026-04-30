@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
-import { Eye } from 'lucide-react'
+import { ExternalLink, Eye } from 'lucide-react'
 
 import type { NewsItem, TeamMember } from '@/app/api/baseApi/type'
 import { useGetNewsQuery } from '@/app/api/news'
+import { useGetRecommendationsQuery } from '@/app/api/recommendations'
 import { useGetTeamQuery } from '@/app/api/team'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -86,10 +87,16 @@ const DashboardIndex = () => {
     error: teamError,
     isLoading: isTeamLoading,
   } = useGetTeamQuery({ page: 1, limit: 100 })
+  const {
+    data: recommendationsData,
+    error: recommendationsError,
+    isLoading: isRecommendationsLoading,
+  } = useGetRecommendationsQuery({ page: 1, limit: 6 })
   const [carouselApi, setCarouselApi] = useState<CarouselApi>()
   const [activeSlide, setActiveSlide] = useState(0)
   const latestNews = getLatestNews(newsData?.data ?? [])
   const team = teamData?.data ?? []
+  const recommendations = recommendationsData?.data ?? []
 
   useEffect(() => {
     if (!carouselApi) return
@@ -205,6 +212,67 @@ const DashboardIndex = () => {
           ))}
         </div>
       ) : null}
+
+      <section className="mt-6 flex flex-col gap-6">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-semibold tracking-normal">Recommendations</h2>
+          <p className="text-sm text-muted-foreground">
+            Public recommendation linklari.
+          </p>
+        </div>
+
+        {isRecommendationsLoading ? <TableSkeleton rows={3} /> : null}
+        {recommendationsError ? (
+          <ErrorAlert
+            error={recommendationsError}
+            fallback="Recommendations olinmadi"
+          />
+        ) : null}
+
+        {!isRecommendationsLoading && recommendations.length === 0 ? (
+          <EmptyList
+            description="Hozircha recommendation mavjud emas."
+            title="Recommendation yo'q"
+          />
+        ) : null}
+
+        {recommendations.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {recommendations.map((recommendation) => (
+              <Card key={recommendation._id}>
+                <CardHeader>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline">{recommendation.source}</Badge>
+                  </div>
+                  <CardTitle className="line-clamp-2 text-lg">
+                    <a
+                      className="underline-offset-4 hover:underline"
+                      href={recommendation.href}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {recommendation.title}
+                    </a>
+                  </CardTitle>
+                  <CardDescription>{formatDate(recommendation.created_at)}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild size="sm" variant="outline">
+                    <a
+                      href={recommendation.href}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <ExternalLink data-icon="inline-start" />
+                      Open
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       <section className="mt-6 flex flex-col gap-6">
         <div className="flex flex-col gap-1">

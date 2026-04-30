@@ -18,11 +18,20 @@ export const categoriesApi = baseApi.injectEndpoints({
         url: '/categories',
         params: params ?? undefined,
       }),
-      providesTags: ['category'],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map((category) => ({
+                type: 'category' as const,
+                id: category._id,
+              })),
+              { type: 'category' as const, id: 'LIST' },
+            ]
+          : [{ type: 'category' as const, id: 'LIST' }],
     }),
     getCategory: builder.query<ApiSuccessResponse<Category>, string>({
       query: (id) => `/categories/${id}`,
-      providesTags: ['category'],
+      providesTags: (_result, _error, id) => [{ type: 'category', id }],
     }),
     createCategory: builder.mutation<
       ApiSuccessResponse<Category>,
@@ -33,7 +42,7 @@ export const categoriesApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['category'],
+      invalidatesTags: [{ type: 'category', id: 'LIST' }],
     }),
     updateCategory: builder.mutation<
       ApiSuccessResponse<Category>,
@@ -44,14 +53,22 @@ export const categoriesApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: ['category', 'news'],
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'category', id },
+        { type: 'category', id: 'LIST' },
+        'news',
+      ],
     }),
     deleteCategory: builder.mutation<MessageResponse, string>({
       query: (id) => ({
         url: `/categories/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['category', 'news'],
+      invalidatesTags: (_result, _error, id) => [
+        { type: 'category', id },
+        { type: 'category', id: 'LIST' },
+        'news',
+      ],
     }),
   }),
 })

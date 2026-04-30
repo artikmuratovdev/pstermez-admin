@@ -72,7 +72,7 @@ const baseQueryWithRefresh: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: 'baseApi',
   baseQuery: baseQueryWithRefresh,
-  tagTypes: ['admin', 'user', 'category', 'news', 'team'],
+  tagTypes: ['admin', 'user', 'category', 'news', 'team', 'recommendation'],
   keepUnusedDataFor: 60,
   refetchOnFocus: true,
   refetchOnReconnect: true,

@@ -16,6 +16,7 @@ export type ApiSuccessResponse<TData> = {
 export type PaginatedApiSuccessResponse<TData> = ApiSuccessResponse<TData> & {
   page: number
   limit: number
+  total?: number
   next?: number
   prev?: number
   totalPages: number
@@ -185,6 +186,23 @@ export type TeamFormRequest = {
   subject?: string
   international: boolean
   country?: string
+}
+
+export type Recommendation = {
+  _id: string
+  title: string
+  href: string
+  source: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type RecommendationFilters = PaginationParams
+
+export type RecommendationFormRequest = {
+  title: string
+  href: string
+  source: string
 }
 
 export type UploadFileResponse = {

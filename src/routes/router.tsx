@@ -8,12 +8,14 @@ import DashboardIndex from '../pages/Home'
 import NewsFormPage from '../pages/News/Form'
 import NewsPage from '../pages/News'
 import NewsDetailPage from '../pages/News/Detail'
+import RecommendationsPage from '../pages/Recommendations'
 import SettingsPage from '../pages/Settings'
 import TeamFormPage from '../pages/Team/Form'
 import TeamPage from '../pages/Team'
 import TeamDetailPage from '../pages/Team/Detail'
 import Login from '../pages/Login/Login'
 import PrivateRoute from './PrivateRoute'
+import NotFoundPage from '../pages/NotFound'
 
 export default createBrowserRouter([
   {
@@ -56,6 +58,10 @@ export default createBrowserRouter([
                 Component: NewsDetailPage,
               },
               {
+                path: 'recommendations',
+                Component: RecommendationsPage,
+              },
+              {
                 path: 'team',
                 Component: TeamPage,
               },
@@ -75,6 +81,10 @@ export default createBrowserRouter([
                 path: 'settings',
                 Component: SettingsPage,
               },
+              {
+                path: '*',
+                Component: NotFoundPage,
+              },
             ],
           },
         ],
@@ -82,6 +92,10 @@ export default createBrowserRouter([
       {
         path: 'login',
         Component: Login,
+      },
+      {
+        path: '*',
+        Component: NotFoundPage,
       },
     ],
   },
