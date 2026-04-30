@@ -206,13 +206,12 @@ const NewsFormPage = () => {
           : undefined
       )
     } catch (uploadError) {
+      const uploadErrorMessage = getApiErrorMessage(uploadError, 'Fayllar yuklanmadi')
+
       files.forEach((file) =>
-        options?.onError(
-          file,
-          uploadError instanceof Error ? uploadError : new Error('Upload failed')
-        )
+        options?.onError(file, new Error(uploadErrorMessage))
       )
-      toast.error(getApiErrorMessage(uploadError, 'Fayllar yuklanmadi'))
+      toast.error(uploadErrorMessage)
     }
   }
 

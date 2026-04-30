@@ -17,6 +17,28 @@ const isApiErrorResponse = (data: unknown): data is ApiErrorResponse => {
   )
 }
 
+const PAYLOAD_TOO_LARGE_MESSAGE = 'Fayl hajmi juda katta'
+
+const isPayloadTooLargeError = (error: unknown) => {
+  const queryError = error as FetchBaseQueryError
+
+  if (queryError.status === 413) return true
+
+  const data = queryError.data
+  if (!data || typeof data !== 'object') return false
+
+  const response = data as Partial<ApiErrorResponse> & {
+    status?: unknown
+    statusCode?: unknown
+  }
+
+  return (
+    response.status === 413 ||
+    response.statusCode === 413 ||
+    response.error?.statusCode === 413
+  )
+}
+
 export const getApiErrorResponse = (
   error: unknown
 ): ApiErrorResponse | null => {
@@ -33,6 +55,8 @@ export const getApiErrorMessage = (
   error: unknown,
   fallback = 'Server bilan ulanishda xatolik yuz berdi.'
 ) => {
+  if (isPayloadTooLargeError(error)) return PAYLOAD_TOO_LARGE_MESSAGE
+
   const apiErrorMessage = getApiErrorResponse(error)?.error.msg
   if (apiErrorMessage) return apiErrorMessage
 
