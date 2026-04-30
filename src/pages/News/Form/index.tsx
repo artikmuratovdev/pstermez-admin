@@ -14,7 +14,7 @@ import type {
 import { useGetCategoriesQuery } from '@/app/api/categories'
 import {
   useCreateNewsMutation,
-  useGetNewsQuery,
+  useGetNewsByIdQuery,
   useUpdateNewsMutation,
 } from '@/app/api/news'
 import { useUploadFileMutation, useUploadFilesMutation } from '@/app/api/upload'
@@ -64,6 +64,9 @@ const initialForm: NewsFormRequest = {
 
 const getCategoryId = (category: NewsItem['category']) =>
   typeof category === 'string' ? category : category._id
+
+const getCategoryName = (category: NewsItem['category']) =>
+  typeof category === 'string' ? category : category.name
 
 const getMediaArray = (media?: NewsItem['media']) => media ?? []
 
@@ -118,8 +121,8 @@ const NewsFormPage = () => {
     data,
     error: loadError,
     isLoading: isNewsLoading,
-  } = useGetNewsQuery({ page: 1, limit: 1000 }, { skip: !isEdit })
-  const news = data?.data.find((item) => item._id === newsId)
+  } = useGetNewsByIdQuery(newsId, { skip: !isEdit })
+  const news = data?.data
   const [form, setForm] = useState<NewsFormRequest>(() => getInitialForm(news))
   const [uploadQueue, setUploadQueue] = useState<File[]>([])
   const [loadedNewsId, setLoadedNewsId] = useState('')
@@ -128,6 +131,17 @@ const NewsFormPage = () => {
   const [uploadFile, uploadState] = useUploadFileMutation()
   const [uploadFiles, uploadFilesState] = useUploadFilesMutation()
   const categories = categoriesData?.data ?? []
+  const selectedCategory =
+    news?.category && form.category === getCategoryId(news.category)
+      ? {
+          _id: getCategoryId(news.category),
+          name: getCategoryName(news.category),
+        }
+      : undefined
+  const categoryOptions =
+    selectedCategory && !categories.some((category) => category._id === selectedCategory._id)
+      ? [selectedCategory, ...categories]
+      : categories
   const error = createState.error ?? updateState.error
   const isLoading = createState.isLoading || updateState.isLoading
   const isUploading = uploadState.isLoading || uploadFilesState.isLoading
@@ -364,7 +378,7 @@ const NewsFormPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {categories.map((category) => (
+                    {categoryOptions.map((category) => (
                       <SelectItem key={category._id} value={category._id}>
                         {category.name}
                       </SelectItem>
